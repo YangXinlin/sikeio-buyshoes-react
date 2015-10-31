@@ -10,14 +10,14 @@ let App = React.createClass({
         </div>
         <div className="site__main">
           <div className="site__left-sidebar">
-            {/* <SiteTitle/> */}
+            <SiteTitle/>
           </div>
           <div className="site__content">
-            {/* <Products/> */}
+            <Products/>
           </div> {/* site__content */}
         </div> {/* site__main */}
         <div className="site__right-sidebar">
-          {/* <Cart/> */}
+          <Cart/>
           {/* <Checkout/> */}
         </div> {/* site__right-sidebar */}
         <a className="site__right-sidebar-toggle">

@@ -17,12 +17,24 @@ var App = React.createClass({
       React.createElement(
         "div",
         { className: "site__main" },
-        React.createElement("div", { className: "site__left-sidebar" }),
-        React.createElement("div", { className: "site__content" }),
+        React.createElement(
+          "div",
+          { className: "site__left-sidebar" },
+          React.createElement(SiteTitle, null)
+        ),
+        React.createElement(
+          "div",
+          { className: "site__content" },
+          React.createElement(Products, null)
+        ),
         " "
       ),
       " ",
-      React.createElement("div", { className: "site__right-sidebar" }),
+      React.createElement(
+        "div",
+        { className: "site__right-sidebar" },
+        React.createElement(Cart, null)
+      ),
       " ",
       React.createElement(
         "a",
@@ -61,4 +73,4 @@ window.onload = function () {
   // 使用 App 组件替换 `#root` 的 innerHTML。
   React.render(React.createElement(App, null), document.querySelector("#root"));
 };
-/* <SiteTitle/> */ /* <Products/> */ /* site__content */ /* site__main */ /* <Cart/> */ /* <Checkout/> */ /* site__right-sidebar */
+/* site__content */ /* site__main */ /* <Checkout/> */ /* site__right-sidebar */
