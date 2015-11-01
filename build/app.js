@@ -9,11 +9,7 @@ var App = React.createClass({
     return React.createElement(
       "div",
       { className: "site" },
-      React.createElement(
-        "div",
-        { className: "bg" },
-        React.createElement("div", { className: "bg__img" })
-      ),
+      this.renderBackground(),
       React.createElement(
         "div",
         { className: "site__main" },
@@ -137,30 +133,37 @@ var products = {
   }
 };
 
-var Products = React.createClass({
-  displayName: "Products",
+var cartItems = {
+  "jameson-vulc": {
+    id: "jameson-vulc",
+    quantity: 1
+  },
 
-  render: function render() {
-    var product = {
-      name: "Jameson Vulc",
-      price: 64.99,
-      imagePath: "img/shoes/jameson-vulc-brown-gum-orig.png",
-      gender: "man"
-    };
+  "marana-x-hook-ups": {
+    id: "marana-x-hook-ups",
+    quantity: 2
+  },
 
-    return React.createElement(
-      "div",
-      { className: "products" },
-      React.createElement(Product, { product: product })
-    );
+  "scout-womens-6": {
+    id: "scout-womens-6",
+    quantity: 2
+  },
+
+  "scout-womens-coco-ho-5": {
+    id: "scout-womens-coco-ho-5",
+    quantity: 1
+  },
+
+  "jameson-2-womens-8": {
+    id: "jameson-2-womens-8",
+    quantity: 1
   }
-});
+};
 
 var Product = React.createClass({
   displayName: "Product",
 
   render: function render() {
-    // 这个组件需要 `product` 属性。
     var _props$product = this.props.product;
     var name = _props$product.name;
     var price = _props$product.price;
@@ -168,9 +171,9 @@ var Product = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "product " },
+      { className: "product" },
       this.renderDisplay(price, imagePath),
-      this.rededDesc(name)
+      this.renderDesc(name)
     );
   },
   renderDisplay: function renderDisplay(price, imagePath) {
@@ -206,6 +209,189 @@ var Product = React.createClass({
         name
       ),
       React.createElement("img", { className: "product__heart", src: "img/heart.svg" })
+    );
+  }
+});
+
+var Products = React.createClass({
+  displayName: "Products",
+
+  render: function render() {
+    var children = [];
+    for (var key in products) {
+      children.push(React.createElement(Product, { key: key, product: products[key] }));
+    };
+
+    return React.createElement(
+      "div",
+      { className: "products" },
+      children
+    );
+  }
+});
+
+var CartItem = React.createClass({
+  displayName: "CartItem",
+
+  render: function render() {
+    var cartItem = this.props.cartItem;
+
+    var quantity = cartItem.quantity;
+    var product = products[cartItem.id];
+    return React.createElement(
+      "div",
+      { className: "cart-item" },
+      React.createElement(
+        "div",
+        { className: "cart-item__top-part" },
+        React.createElement(
+          "div",
+          { className: "cart-item__image" },
+          React.createElement("img", { src: product.imagePath })
+        ),
+        React.createElement(
+          "div",
+          { className: "cart-item__top-part__middle" },
+          React.createElement(
+            "div",
+            { className: "cart-item__title" },
+            product.name
+          ),
+          React.createElement(
+            "div",
+            { className: "cart-item__price" },
+            quantity === 1 ? "$" + product.price : "$" + product.price + "*" + quantity
+          )
+        ),
+        React.createElement("img", { className: "cart-item__trash", src: "img/trash-icon.svg" })
+      ),
+      React.createElement(
+        "div",
+        { className: "cart-item__qty" },
+        React.createElement(
+          "div",
+          { className: "adjust-qty" },
+          React.createElement(
+            "a",
+            { className: "adjust-qty__button" },
+            "-"
+          ),
+          React.createElement(
+            "div",
+            { className: "adjust-qty__number" },
+            "2"
+          ),
+          React.createElement(
+            "a",
+            { className: "adjust-qty__button" },
+            "+"
+          )
+        )
+      )
+    );
+  }
+});
+
+var QuantityControl = React.createClass({
+  displayName: "QuantityControl",
+
+  render: function render() {
+    var quantity = this.props.item.quantity;
+    return React.createElement(
+      "div",
+      { className: "adjust-qty" + (this.props.variant === 'gray' ? " adjust-qty--gray" : "") },
+      React.createElement(
+        "a",
+        { className: "adjust-qty__button" },
+        "-"
+      ),
+      React.createElement(
+        "div",
+        { className: "adjust-qty__number" },
+        quantity
+      ),
+      React.createElement(
+        "a",
+        { className: "adjust-qty__button" },
+        "+"
+      )
+    );
+  }
+});
+
+var Cart = React.createClass({
+  displayName: "Cart",
+
+  componentDidMount: function componentDidMount() {
+    var $content = React.findDOMNode(this.refs.content);
+    Ps.initialize($content);
+  },
+
+  render: function render() {
+    var cartItems_Arr = [];
+    for (var key in cartItems) {
+      cartItems_Arr.push(React.createElement(CartItem, { key: key, cartItem: cartItems[key] }));
+    }
+
+    return React.createElement(
+      "div",
+      { className: "cart", ref: "content" },
+      React.createElement(
+        "h3",
+        { className: "cart__title" },
+        "Shopping Cart"
+      ),
+      React.createElement(
+        "div",
+        { className: "cart__content" },
+        React.createElement(
+          "h3",
+          { className: "cart__title cart__title--spacer" },
+          "Shopping Cart"
+        ),
+        cartItems_Arr
+      )
+    );
+  }
+});
+
+var Checkout = React.createClass({
+  displayName: "Checkout",
+
+  render: function render() {
+    var total = 0;
+    for (var key in cartItems) {
+      total += cartItems[key].quantity * products[key].price;
+    }
+    return React.createElement(
+      "div",
+      { className: "checkout" },
+      React.createElement("hr", { className: "checkout__divider" }),
+      React.createElement("input", { type: "text", className: "checkout__coupon-input", placeholder: "coupon code" }),
+      React.createElement(
+        "div",
+        { className: "checkout__amount" },
+        React.createElement(
+          "div",
+          { className: "checkout__amount-label" },
+          "Subtotal"
+        ),
+        React.createElement(
+          "div",
+          { className: "checkout__amount-price" },
+          '$' + total
+        )
+      ),
+      React.createElement(
+        "a",
+        { className: "checkout__button" },
+        React.createElement("img", { className: "checkout__button__icon", src: "img/cart-icon.svg" }),
+        React.createElement(
+          "span",
+          { className: "checkout__button__label" },
+          "Checkout"
+        )
+      )
     );
   }
 });

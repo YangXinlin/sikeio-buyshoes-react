@@ -3,17 +3,15 @@ let App = React.createClass({
   // `render` 方法将生成 `buyshoes` 网页的 Virtual DOM。
   render: function() {
     return (
+
       <div className="site">
-        <div className="bg">
-          <div className="bg__img">
-          </div>
-        </div>
+        {this.renderBackground()}
         <div className="site__main">
           <div className="site__left-sidebar">
-          <SiteTitle/>
+            <SiteTitle/>
           </div>
           <div className="site__content">
-          <Products/>
+            <Products/>
           </div> {/* site__content */}
         </div> {/* site__main */}
         <div className="site__right-sidebar">
@@ -114,32 +112,41 @@ let products = {
   },
 };
 
-let Products = React.createClass({
-  render() {
-    let product = {
-      name: "Jameson Vulc",
-      price: 64.99,
-      imagePath: "img/shoes/jameson-vulc-brown-gum-orig.png",
-      gender: "man",
-    };
-
-    return (
-      <div className="products">
-        <Product product={product}/>
-      </div>
-    );
+let cartItems = {
+  "jameson-vulc": {
+    id: "jameson-vulc",
+    quantity: 1,
   },
-});
+
+  "marana-x-hook-ups": {
+    id: "marana-x-hook-ups",
+    quantity: 2,
+  },
+
+  "scout-womens-6": {
+    id: "scout-womens-6",
+    quantity: 2,
+  },
+
+  "scout-womens-coco-ho-5": {
+    id: "scout-womens-coco-ho-5",
+    quantity: 1,
+  },
+
+  "jameson-2-womens-8": {
+    id: "jameson-2-womens-8",
+    quantity: 1,
+  },
+};
 
 let Product = React.createClass({
   render() {
-    // 这个组件需要 `product` 属性。
-    let {name,price,imagePath} = this.props.product;
+    let {name, price, imagePath} = this.props.product;
 
     return (
-      <div className="product ">
-        {this.renderDisplay(price, imagePath)}
-        {this.rededDesc(name)}
+      <div className="product">
+          {this.renderDisplay(price, imagePath)}
+          {this.renderDesc(name)}
       </div>
     );
   },
@@ -165,6 +172,118 @@ let Product = React.createClass({
       )
   },
 });
+
+let Products = React.createClass({
+    render() {
+      let children = [];
+      for (var key in products) {
+        children.push( <Product key={key} product={products[key]}/>);
+      };
+
+      return (
+        <div className="products">
+            {children}
+        </div>
+      );
+    }
+});
+
+let CartItem = React.createClass({
+  render(){
+    let {cartItem} = this.props;
+    let quantity = cartItem.quantity;
+    let product = products[cartItem.id];
+    return (
+      <div className="cart-item">
+        <div className="cart-item__top-part">
+          <div className="cart-item__image">
+            <img  src={product.imagePath}/>
+          </div>
+
+          <div className="cart-item__top-part__middle">
+            <div className="cart-item__title">{product.name}</div>
+
+            <div className="cart-item__price">{quantity === 1? "$" + product.price : "$" + product.price + "*" + quantity}</div>
+          </div>
+
+          <img className="cart-item__trash" src="img/trash-icon.svg"/>
+        </div>
+
+        <div className="cart-item__qty">
+          <div className="adjust-qty">
+            <a className="adjust-qty__button">-</a>
+            <div className="adjust-qty__number">2</div>
+            <a className="adjust-qty__button">+</a>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+});
+
+let QuantityControl = React.createClass({
+    render() {
+        let quantity = this.props.item.quantity;
+        return(
+            <div className={"adjust-qty" + (this.props.variant === 'gray' ? " adjust-qty--gray" : "")}>
+                <a className="adjust-qty__button">-</a>
+                <div className="adjust-qty__number">{quantity}</div>
+                <a className="adjust-qty__button">+</a>
+            </div>
+        )
+    }
+});
+
+let Cart = React.createClass({
+  componentDidMount(){
+    let $content = React.findDOMNode(this.refs.content);
+    Ps.initialize($content);
+  },
+
+  render() {
+    let cartItems_Arr = [];
+    for(var key in cartItems){
+      cartItems_Arr.push(<CartItem key={key} cartItem={cartItems[key]}/>)
+    }
+
+    return (
+      <div className="cart" ref="content">
+        <h3 className="cart__title">Shopping Cart</h3>
+        <div className="cart__content">
+          <h3 className="cart__title cart__title--spacer">Shopping Cart</h3>
+          {cartItems_Arr}
+        </div>
+      </div>
+    );
+  }
+});
+
+let Checkout = React.createClass({
+    render(){
+        let total = 0 ;
+        for(var key in cartItems){
+            total += cartItems[key].quantity * (products[key].price);
+        }
+        return (
+
+            <div className="checkout">
+                <hr className="checkout__divider"/>
+                <input type="text" className="checkout__coupon-input" placeholder="coupon code" />
+                <div className="checkout__amount">
+                    <div className="checkout__amount-label">Subtotal</div>
+                    <div className="checkout__amount-price">{'$' + total}</div>
+                </div>
+                <a className="checkout__button">
+                    <img className="checkout__button__icon" src="img/cart-icon.svg"/>
+                    <span className="checkout__button__label">Checkout</span>
+                </a>
+            </div>
+        )
+    }
+});
+
+
 
 window.onload = () => {
   // 使用 App 组件替换 `#root` 的 innerHTML。
